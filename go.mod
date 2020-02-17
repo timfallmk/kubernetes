@@ -68,7 +68,7 @@ require (
 	github.com/google/go-cmp v0.3.0
 	github.com/google/gofuzz v1.1.0
 	github.com/google/uuid v1.1.1
-	github.com/googleapis/gnostic v0.1.0
+	github.com/googleapis/gnostic v0.4.1
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.7.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.1
@@ -122,7 +122,7 @@ require (
 	go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738
 	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586
 	golang.org/x/lint v0.0.0-20190409202823-959b441ac422
-	golang.org/x/net v0.0.0-20191004110552-13f9640d40b9
+	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/sys v0.0.0-20191022100944-742c48ecaeb7
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
