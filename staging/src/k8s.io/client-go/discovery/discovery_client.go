@@ -441,6 +441,28 @@ func (d *DiscoveryClient) OpenAPISchema() (*openapi_v2.Document, error) {
 	return document, nil
 }
 
+func (d *DiscoveryClient) rawProtoMessage() (*proto.Message, error) {
+	data, err := d.restClient.Get().AbsPath("/openapi/v2").SetHeader("Accept", mimePb).Do(context.TODO()).Raw()
+	if err != nil {
+		if errors.IsForbidden(err) || errors.IsNotFound(err) || errors.IsNotAcceptable(err) {
+			// single endpoint not found/registered in old server, try to fetch old endpoint
+			// TODO: remove this when kubectl/client-go don't work with 1.9 server
+			data, err = d.restClient.Get().AbsPath("/swagger-2.0.0.pb-v1").Do(context.TODO()).Raw()
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, err
+		}
+	}
+	message := new(proto.Message)
+	marshalErr := proto.Unmarshal(data, *message)
+	if marshalErr != nil {
+		return nil, marshalErr
+	}
+	return message, nil
+}
+
 // withRetries retries the given recovery function in case the groups supported by the server change after ServerGroup() returns.
 func withRetries(maxRetries int, f func() ([]*metav1.APIGroup, []*metav1.APIResourceList, error)) ([]*metav1.APIGroup, []*metav1.APIResourceList, error) {
 	var result []*metav1.APIResourceList

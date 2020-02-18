@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/googleapis/gnostic/openapiv2"
+	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
 	"github.com/stretchr/testify/assert"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -467,7 +467,7 @@ func openapiSchemaDeprecatedFakeServer(status int) (*httptest.Server, error) {
 			sErr = fmt.Errorf("Unexpected method %v", req.Method)
 		}
 
-		mime.AddExtensionType(".pb-v1", "application/com.github.googleapis.gnostic.OpenAPIv2@68f4ded+protobuf")
+		mime.AddExtensionType(".pb-v1", "application/com.github.googleapis.gnostic.OpenAPIv2@896953e+protobuf")
 
 		output, err := proto.Marshal(&returnedOpenAPI)
 		if err != nil {
@@ -494,7 +494,7 @@ func openapiSchemaFakeServer() (*httptest.Server, error) {
 			sErr = fmt.Errorf("Unexpected accept mime type %v", decipherableFormat)
 		}
 
-		mime.AddExtensionType(".pb-v1", "application/com.github.googleapis.gnostic.OpenAPIv2@68f4ded+protobuf")
+		mime.AddExtensionType(".pb-v1", "application/com.github.googleapis.gnostic.OpenAPIv2@896953e+protobuf")
 
 		output, err := proto.Marshal(&returnedOpenAPI)
 		if err != nil {
@@ -515,11 +515,20 @@ func TestGetOpenAPISchema(t *testing.T) {
 	defer server.Close()
 
 	client := NewDiscoveryClientForConfigOrDie(&restclient.Config{Host: server.URL})
-	got, err := client.OpenAPISchema()
+	got, err := client.rawProtoMessage()
 	if err != nil {
 		t.Fatalf("unexpected error getting openapi: %v", err)
 	}
-	if e, a := returnedOpenAPI, *got; !reflect.DeepEqual(e, a) {
+	data, err := proto.Marshal(&returnedOpenAPI)
+	if err != nil {
+		t.Fatalf("Failed to marshal %+v: %+v", data, err)
+	}
+	message := new(proto.Message)
+	marshalErr := proto.Unmarshal(data, *message)
+	if marshalErr != nil {
+		t.Fatalf("Marshalling failed with %+v", marshalErr)
+	}
+	if e, a := *message, *got; !proto.Equal(e, a) {
 		t.Errorf("expected %v, got %v", e, a)
 	}
 }
