@@ -26,9 +26,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
-	"github.com/googleapis/gnostic/openapiv2"
+	"github.com/golang/protobuf/proto"
+	"github.com/google/go-cmp/cmp"
+	openapi_v2 "github.com/googleapis/gnostic/openapiv2"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/testing/protocmp"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -519,7 +521,7 @@ func TestGetOpenAPISchema(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error getting openapi: %v", err)
 	}
-	if e, a := returnedOpenAPI, *got; !reflect.DeepEqual(e, a) {
+	if e, a := returnedOpenAPI, *got; !cmp.Equal(e, a, protocmp.IgnoreEmptyMessages()) {
 		t.Errorf("expected %v, got %v", e, a)
 	}
 }
